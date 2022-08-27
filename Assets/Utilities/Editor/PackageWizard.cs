@@ -138,7 +138,7 @@ public class PackageWizard : EditorWindow
             _manifestPath = $"{GetProjectPath()}/Packages/com.{domainCompanyName}.{domainPackageName}/package.json";
             
             // Update CI workflow
-            string workflowPath = $"{GetProjectPath()}/.github/workflows/upm.yml";
+            string workflowPath = $"{GetProjectPath()}/.github/workflows/main.yml";
             if (File.Exists(workflowPath))
             {
                 string workflowContents = File.ReadAllText(workflowPath);

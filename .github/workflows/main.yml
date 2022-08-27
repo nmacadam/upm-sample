@@ -1,4 +1,4 @@
-name: UPM Release
+name: CI/CD Pipeline 🧪
 on:
   push:
     branches:
