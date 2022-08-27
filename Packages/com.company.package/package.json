@@ -1,0 +1,24 @@
+{
+  "name": "com.company.package",
+  "version": "0.0.0-preview",
+  "displayName": "Sample Package",
+  "description": "An example of how to set up a custom package",
+  "documentationUrl": "https://github.com/nmacadam/upm-sample",
+  "changelogUrl": "https://github.com/nmacadam/upm-sample",
+  "licensesUrl": "https://github.com/nmacadam/upm-sample",
+  "license": " MIT",
+  "samples": [
+    {
+      "displayName": "Example",
+      "description": "Contains example for how package contents are used.",
+      "path": "Samples~/Example"
+    }
+  ],
+  "keywords": [
+    "example"
+  ],
+  "author": {
+    "name": "Nathan MacAdam",
+    "url": "https://github.com/nmacadam"
+  }
+}

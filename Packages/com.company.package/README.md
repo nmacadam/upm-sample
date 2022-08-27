@@ -1,0 +1,3 @@
+- [Custom Packages in Unity](https://docs.unity3d.com/Manual/CustomPackages.html)
+- [Package Directory Layout](https://docs.unity3d.com/Manual/cus-layout.html)
+- [Writing the Package Manifest](https://docs.unity3d.com/Manual/upm-manifestPkg.html)
