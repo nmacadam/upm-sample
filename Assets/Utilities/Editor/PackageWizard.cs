@@ -137,6 +137,16 @@ public class PackageWizard : EditorWindow
             // Update manifest path
             _manifestPath = $"{GetProjectPath()}/Packages/com.{domainCompanyName}.{domainPackageName}/package.json";
             
+            // Update CI workflow
+            string workflowPath = $"{GetProjectPath()}/.github/workflows/upm.yml";
+            if (File.Exists(workflowPath))
+            {
+                string workflowContents = File.ReadAllText(workflowPath);
+                workflowContents = Regex.Replace(workflowContents, "(?<=(PKG_ROOT:\\sPackages/))([A-z.]*)",
+                    $"com.{domainCompanyName}.{domainPackageName}");
+                File.WriteAllText(workflowPath, workflowContents);
+            }
+            
             // Refresh Asset Database so package gets re-imported immediately
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
