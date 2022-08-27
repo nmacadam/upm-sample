@@ -8,5 +8,3 @@ This repository is designed to be a boilerplate for new packages.  Using the inc
 <p align="center">
 <img src="https://raw.githubusercontent.com/nmacadam/upm-sample/main/.github/images/package-wizard.PNG?token=GHSAT0AAAAAABKVIBOWF73MJJTDL3W7DHAAYYKRXAQ" width="50%" height="50%">
 </p>
-
-Note that the *Package Wizard* does not currently modify the included GitHub Actions workflow to reflect directory name changes.
