@@ -95,3 +95,101 @@ jobs:
         git push origin --tags
       env:
         TAG: upm/v${{ steps.semantic.outputs.new_release_version }}
+  
+  # Build the documentation for the project
+  documentation:
+    needs: test
+    name: Generate documentation ✏
+    runs-on: self-hosted
+    steps:
+      # Checkout (without LFS)
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Git LFS
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+      # Cache
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+      - name: Use README.md as index.md
+        run: cp README.md Documentation/index.md
+
+      - name: Run DocFX
+        uses: nikeee/docfx-action@v1.0.0
+        with:
+          args: Documentation/docfx.json
+
+      # Upload the generated documentation
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: _site
+          path: _site # Must equals the 'build.dest' value on your docfx.json
+  
+  # Deploy the generated documentation to the gh-pages branch
+  deploy:
+    needs: documentation
+    name: Deploy GitHub Pages 📚
+    runs-on: self-hosted
+    steps:
+      # Checkout (without LFS)
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Git LFS
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+      # Cache
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+      # Download the generated documentation
+      - name: Download site artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: _site
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: _site

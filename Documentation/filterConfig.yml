@@ -1,0 +1,16 @@
+apiRules:
+# Default project namespaces
+- include:
+    uidRegex: ^Project
+    type: Namespace
+- include:
+    uidRegex: ^Global
+    type: Namespace
+# First-party tools
+- include:
+    uidRegex: ^Package
+    type: Namespace
+
+- exclude:
+    uidRegex: .*
+    type: Namespace
