@@ -1,6 +1,6 @@
 {
   "name": "com.company.package",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "Sample Package",
   "description": "An example of how to set up a custom package",
   "documentationUrl": "https://github.com/nmacadam/upm-sample",
