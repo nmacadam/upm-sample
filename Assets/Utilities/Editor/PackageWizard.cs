@@ -8,6 +8,9 @@ using UnityEngine;
 public class PackageWizard : EditorWindow
 {
     private string _manifestPath = string.Empty;
+
+    private GUIContent _openIcon;
+    private Vector2 _scoll;
     
     private string _companyName = "Company";
     private string _packageName = "Package";
@@ -39,6 +42,7 @@ public class PackageWizard : EditorWindow
     {
         // Set default manifest path
         _manifestPath = $"{GetProjectPath()}/Packages/com.company.package/package.json";
+        _openIcon = EditorGUIUtility.IconContent("ScaleTool");
     }
     
     private void OnGUI()
@@ -81,12 +85,23 @@ public class PackageWizard : EditorWindow
         
         Regex manifestDomainNameRegex = new Regex("(?<=(\"name\"[:]\\s\"))([A-z._-]*)");
         var manifestDomainName = manifestDomainNameRegex.Match(manifest).Value;
+
+        _scoll = EditorGUILayout.BeginScrollView(_scoll);
+        
+        // Draw affected files
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.LabelField("Affected Files & Directories", new GUIStyle("BoldLabel"));
+        DrawAffectedFiles();
         
         // Draw change previews
         EditorGUILayout.Space();
         
+        EditorGUILayout.LabelField("Change Preview", new GUIStyle("BoldLabel"));
         DrawChangePreview(manifestDomainName, $"com.{domainCompanyName}.{domainPackageName}", richTextLabel);
         DrawAsmdefChanges(_packageName);
+        
+        EditorGUILayout.EndScrollView();
 
         // Disable if not following package domain name naming conventions
         // https://docs.unity3d.com/Manual/cus-naming.html
@@ -147,6 +162,15 @@ public class PackageWizard : EditorWindow
                 File.WriteAllText(workflowPath, workflowContents);
             }
             
+            string releasercPath = $"{GetProjectPath()}/.releaserc.json";
+            if (File.Exists(releasercPath))
+            {
+                string releasercContents = File.ReadAllText(releasercPath);
+                releasercContents = Regex.Replace(releasercContents, "(?<=(Packages/))([A-z.]*)",
+                    $"com.{domainCompanyName}.{domainPackageName}");
+                File.WriteAllText(releasercPath, releasercContents);
+            }
+            
             // Refresh Asset Database so package gets re-imported immediately
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
@@ -162,6 +186,60 @@ public class PackageWizard : EditorWindow
         var rect = EditorGUILayout.GetControlRect(GUILayout.Height(headerHeight));
         GUIContent icon = EditorGUIUtility.IconContent("Package Manager@2x");
         EditorGUI.LabelField(rect, new GUIContent("Package Wizard", icon.image), new GUIStyle("LargeLabel") { alignment = TextAnchor.MiddleCenter, fontSize = 24, fontStyle = FontStyle.Bold });
+    }
+
+    private void DrawAffectedFiles()
+    {
+        EditorGUILayout.BeginVertical(GUI.skin.box);
+        
+        DrawFileListLabel(GetPackageDirectoryPath().Replace('\\', '/'));
+        DrawFileListLabel(_manifestPath);
+        
+        string[] guids = AssetDatabase.FindAssets("t:asmdef");
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (!IsSelectedPackage(path)) continue;
+
+            DrawFileListLabel(path);
+        }
+        
+        string workflowPath = $"{GetProjectPath()}/.github/workflows/main.yml";
+        if (File.Exists(workflowPath))
+        {
+            DrawFileListLabel(workflowPath);
+        }
+        
+        string releasercPath = $"{GetProjectPath()}/.releaserc.json";
+        if (File.Exists(releasercPath))
+        {
+            DrawFileListLabel(releasercPath);
+        }
+        
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawFileListLabel(string path)
+    {
+        if (path.StartsWith("Packages") || path.StartsWith("Assets"))
+        {
+            path = path.Insert(0, $"{GetProjectPath()}/");
+        }
+        
+        var rect = EditorGUILayout.GetControlRect();
+        float buttonWidth = rect.height;
+        float labelWidth = rect.width - buttonWidth;
+        float padding = 4;
+
+        rect.width = buttonWidth;
+        if (GUI.Button(rect, _openIcon, "Label"))
+        {
+            Application.OpenURL(path);
+        }
+        
+        rect.x += buttonWidth + padding;
+        rect.width += labelWidth;
+        EditorGUI.LabelField(rect, path);
     }
 
     private void DrawAsmdefChanges(string packageName)
