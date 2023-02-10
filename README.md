@@ -6,5 +6,5 @@ The Unity package is at `Packages/com.company.package`.  You can develop directl
 This repository is designed to be a boilerplate for new packages.  Using the included *Package Wizard* window, you can quickly rename the package URL, assembly definitions, default namespaces, the package folder name, and the name field of the manifest all at once.  
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/nmacadam/upm-sample/main/.github/images/package-wizard.PNG?token=GHSAT0AAAAAABKVIBOXI74KMD2Z7SZ7ZVIIYYM57GA" width="50%" height="50%">
+<img src="/.github/images/package-wizard.PNG" width="50%" height="50%">
 </p>
